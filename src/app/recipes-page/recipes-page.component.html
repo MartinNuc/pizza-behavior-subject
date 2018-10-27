@@ -1,0 +1,11 @@
+<h1>Create new recipe</h1>
+
+<app-recipe-form></app-recipe-form>
+
+<h1>Existing recipes</h1>
+<ul>
+  <li *ngFor="let recipe of recipes$ | async">
+    {{recipe.name}} (total price: {{ recipe.ingredients | priceOfRecipe }})
+    <button type="button" (click)="recipesService.remove(recipe)">X</button>
+  </li>
+</ul>
