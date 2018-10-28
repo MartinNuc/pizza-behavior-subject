@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -6,6 +6,7 @@ import {
   Validators
 } from '@angular/forms';
 import { RecipesService } from '../recipes.service';
+import { Recipe } from '../recipe';
 
 @Component({
   selector: 'app-recipe-form',
@@ -13,6 +14,15 @@ import { RecipesService } from '../recipes.service';
   styleUrls: ['./recipe-form.component.scss']
 })
 export class RecipeFormComponent implements OnInit {
+
+  @Input()
+  set recipe(value: Recipe) {
+    if (value && value.ingredients) {
+      value.ingredients.forEach(i => this.addIngredient());
+    }
+    this.recipeForm.patchValue(value || {});
+  }
+
   recipeForm: FormGroup;
 
   get ingredients() {
@@ -21,6 +31,7 @@ export class RecipeFormComponent implements OnInit {
 
   constructor(public fb: FormBuilder, public recipeService: RecipesService) {
     this.recipeForm = fb.group({
+      id: [],
       name: ['', [Validators.required]],
       ingredients: fb.array([])
     });
@@ -33,7 +44,7 @@ export class RecipeFormComponent implements OnInit {
   }
 
   saveRecipe() {
-    this.recipeService.createRecipe(this.recipeForm.value);
+    this.recipeService.saveRecipe(this.recipeForm.value);
     this.recipeForm.reset();
 
     // NOTE: ugly! but recipeForm.reset() just resets values but doesnt remove controls
