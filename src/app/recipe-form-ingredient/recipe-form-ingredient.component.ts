@@ -13,6 +13,7 @@ import {
   NG_VALIDATORS
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { Ingredient } from '../ingredient';
 
 @Component({
   selector: 'app-recipe-form-ingredient',
@@ -41,6 +42,7 @@ export class RecipeFormIngredientComponent
   changesSubscription: Subscription;
 
   constructor(fb: FormBuilder, public ingredietsService: IngredientsService) {
+    ingredietsService.reloadIngredients();
     this.form = fb.group({
       count: [0, [Validators.required, Validators.min(1)]],
       ingredient: [null, [Validators.required]]
@@ -74,5 +76,9 @@ export class RecipeFormIngredientComponent
 
   validate(_: AbstractControl): ValidationErrors {
     return this.form.valid ? null : { incompleteIngredientInRecipe: true };
+  }
+
+  compareById(a: Ingredient, b: Ingredient) {
+    return a && b && a.id === b.id;
   }
 }

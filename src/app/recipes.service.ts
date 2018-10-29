@@ -1,36 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Recipe } from './recipe';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipesService {
-
-  private _recipes$ = new BehaviorSubject<Recipe[]>([]);
+  private _recipes$ = new ReplaySubject<Recipe[]>(1);
   get recipes$() {
     return this._recipes$.asObservable();
   }
 
-  saveRecipe(recipe: Recipe) {
-    recipe.id ? this.edit(recipe) : this.create(recipe);
+  constructor(public http: HttpClient) {}
+
+  async reloadRecipes() {
+    const recipes = await this.http.get<Recipe[]>('/api/recipes').toPromise();
+    this._recipes$.next(recipes);
   }
 
-  create(recipe: Recipe): void {
-    const id = Math.round(Math.random() * 10000 + 1);
-    const recipes = this._recipes$.getValue();
-    this._recipes$.next([...recipes, {...recipe, id} ]);
+  saveRecipe(recipe: Recipe) {
+    return recipe.id ? this.edit(recipe) : this.create(recipe);
+  }
+
+  create(recipe: Recipe) {
+    return this.http.post('/api/recipes', recipe);
   }
 
   edit(recipe: Recipe) {
-    const recipes = this._recipes$.getValue();
-    const index = recipes.findIndex(i => i.id === recipe.id);
-    recipes[index] = recipe;
-    this._recipes$.next([...recipes]);
+    return this.http.put(`/api/recipes/${recipe.id}`, recipe);
   }
 
-  remove(recipe: Recipe): void {
-    const recipes = this._recipes$.getValue();
-    this._recipes$.next([...recipes.filter(i => i !== recipe)]);
+  remove(recipe: Recipe) {
+    return this.http.delete(`/api/recipes/${recipe.id}`);
   }
 }

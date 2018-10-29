@@ -27,15 +27,22 @@ export class IngredientsPageComponent implements OnInit {
 
   ngOnInit() {
     this.buildForm();
+    this.ingredientsService.reloadIngredients();
   }
 
-  save() {
-    this.ingredientsService.saveIngredient(this.newIngredientForm.value);
+  async save() {
+    await this.ingredientsService.saveIngredient(this.newIngredientForm.value).toPromise();
+    this.ingredientsService.reloadIngredients();
     this.newIngredientForm.reset();
   }
 
   edit(ingredient: Ingredient) {
     this.newIngredientForm.reset();
     this.newIngredientForm.setValue(ingredient);
+  }
+
+  async remove(ingredient: Ingredient) {
+    await this.ingredientsService.remove(ingredient).toPromise();
+    this.ingredientsService.reloadIngredients();
   }
 }

@@ -43,8 +43,9 @@ export class RecipeFormComponent implements OnInit {
     this.ingredients.push(this.fb.control({}, [Validators.required]));
   }
 
-  saveRecipe() {
-    this.recipeService.saveRecipe(this.recipeForm.value);
+  async saveRecipe() {
+    await this.recipeService.saveRecipe(this.recipeForm.value).toPromise();
+    this.recipeService.reloadRecipes();
     this.recipeForm.reset();
 
     // NOTE: ugly! but recipeForm.reset() just resets values but doesnt remove controls

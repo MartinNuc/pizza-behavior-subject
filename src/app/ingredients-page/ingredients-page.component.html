@@ -11,6 +11,6 @@
   <li *ngFor="let ingredient of ingredients$ | async">
     {{ingredient.name}} for {{ingredient.price}}
     <button type="button" (click)="edit(ingredient)">edit</button>
-    <button type="button" (click)="ingredientsService.remove(ingredient)">X</button>
+    <button type="button" (click)="remove(ingredient)">X</button>
   </li>
 </ul>
